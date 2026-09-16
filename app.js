@@ -76,12 +76,16 @@
   var fIssuedTo = document.getElementById("fIssuedTo");
   var fPurpose = document.getElementById("fPurpose");
   var fDueDate = document.getElementById("fDueDate");
+<<<<<<< HEAD
   var pageFMobile = document.getElementById("pageFMobile");
   var pageFDueDate = document.getElementById("pageFDueDate");
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
 
   init();
 
   function init() {
+<<<<<<< HEAD
     [fMobile, pageFMobile].forEach(function (input) {
       input.addEventListener("input", function () {
         input.value = input.value.replace(/\D/g, "").slice(0, 10);
@@ -94,6 +98,8 @@
       });
     });
     setDueDateMinimums();
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     dashboardNewEntryBtn.addEventListener("click", openNewEntryFromDashboard);
     dashboardViewBtn.addEventListener("click", openLogin);
     backToDashboardBtn.addEventListener("click", showDashboardHome);
@@ -167,9 +173,12 @@
     registerView.hidden = true;
     entryPage.hidden = false;
     entryPageForm.reset();
+<<<<<<< HEAD
     pageFMobile.setCustomValidity("");
     pageFDueDate.setCustomValidity("");
     setDueDateMinimums();
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     document.getElementById("pageFDate").value = todayISO();
     document.getElementById("pageFQuantity").value = "1";
     document.getElementById("pageFName").focus();
@@ -177,7 +186,10 @@
 
   function handleEntryPageSave(e) {
     e.preventDefault();
+<<<<<<< HEAD
     if (!validateEntryFields(pageFMobile, pageFDueDate)) return;
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     entries.unshift({
       id: nextSrNo(),
       date: document.getElementById("pageFDate").value,
@@ -197,7 +209,11 @@
     });
     saveEntries();
     render();
+<<<<<<< HEAD
     showToast("Entry successfully added");
+=======
+    showToast("New issue entry added");
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     showDashboardHome();
   }
 
@@ -226,6 +242,7 @@
     return local.toISOString().slice(0, 16);
   }
 
+<<<<<<< HEAD
   function todayDateISO() {
     return todayISO().slice(0, 10);
   }
@@ -248,6 +265,8 @@
     return true;
   }
 
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
   function fmtDate(iso) {
     if (!iso) return "";
     if (iso.includes("T")) {
@@ -353,7 +372,11 @@
       '</div></td>';
 
     // Return date input
+<<<<<<< HEAD
     var returnCell = tr.children[12];
+=======
+    var returnCell = tr.children[11];
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     var returnInput = document.createElement("input");
     returnInput.type = "date";
     returnInput.className = "date-input";
@@ -370,7 +393,11 @@
     returnCell.appendChild(returnInput);
 
     // Received by input
+<<<<<<< HEAD
     var receivedCell = tr.children[13];
+=======
+    var receivedCell = tr.children[12];
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     var receivedInput = document.createElement("input");
     receivedInput.type = "text";
     receivedInput.className = "received-input";
@@ -384,7 +411,11 @@
     receivedCell.appendChild(receivedInput);
 
     // Status select
+<<<<<<< HEAD
     var statusCell = tr.children[14];
+=======
+    var statusCell = tr.children[13];
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     var statusSelect = document.createElement("select");
     statusSelect.className = "status-select status-" + status;
     ["Issued", "Returned", "Overdue"].forEach(function (opt) {
@@ -440,9 +471,12 @@
     modalTitle.textContent = "New Issue Entry";
     entryForm.reset();
     fEntryId.value = "";
+<<<<<<< HEAD
     fMobile.setCustomValidity("");
     fDueDate.setCustomValidity("");
     setDueDateMinimums();
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     fDate.value = todayISO();
     fQuantity.value = "1";
     modalOverlay.classList.add("open");
@@ -452,8 +486,11 @@
   function openEditEntryModal(entry) {
     modalTitle.textContent = "Edit Issue Entry";
     fEntryId.value = entry.id;
+<<<<<<< HEAD
     fMobile.setCustomValidity("");
     fDueDate.setCustomValidity("");
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     fDate.value = entry.date;
     fName.value = entry.name;
     fStudentId.value = entry.studentId;
@@ -464,7 +501,10 @@
     fIssuedBy.value = entry.issuedBy;
     fIssuedTo.value = entry.issuedTo;
     fPurpose.value = entry.purpose;
+<<<<<<< HEAD
     setDueDateMinimums();
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
     fDueDate.value = entry.dueDate;
     modalOverlay.classList.add("open");
     fName.focus();
@@ -476,7 +516,10 @@
 
   function handleSaveEntry(e) {
     e.preventDefault();
+<<<<<<< HEAD
     if (!validateEntryFields(fMobile, fDueDate)) return;
+=======
+>>>>>>> 2265d161a7f3b19284a2571218f285b111242a6f
 
     var id = fEntryId.value;
     var isEdit = !!id;
