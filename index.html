@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Item Issue Register — Issue Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell" id="appShell">
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">▤</span>
+    <div class="brand-text">
+      <h1>Item Issue Register</h1>
+      <p>Stores &amp; Inventory Office</p>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+  <section class="dashboard-home" id="dashboardHome">
+    <div class="page-head dashboard-heading">
+      <div>
+        <p class="eyebrow">Administrator</p>
+        <h2>Dashboard</h2>
+        <p class="dashboard-intro">Choose an action to manage item issues.</p>
+      </div>
+    </div>
+    <div class="dashboard-options">
+      <button class="dashboard-option dashboard-option-primary" id="dashboardNewEntryBtn" type="button">
+        <span class="option-icon" aria-hidden="true">＋</span>
+        <span class="option-text"><strong>New Issue Entry</strong><small>Record an item issued to a person</small></span>
+        <span class="option-arrow" aria-hidden="true">→</span>
+      </button>
+      <button class="dashboard-option" id="dashboardViewBtn" type="button">
+        <span class="option-icon" aria-hidden="true">⌕</span>
+        <span class="option-text"><strong>Admin Login</strong><small>Sign in to access the Issue Dashboard</small></span>
+        <span class="option-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="registerView" hidden>
+
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Register</p>
+      <h2>Issue Dashboard</h2>
+    </div>
+    <button class="btn btn-ghost" id="backFromRegisterBtn" type="button">Back to dashboard</button>
+  </div>
+
+  <section class="stats" aria-label="Register summary">
+    <div class="stat stat-total">
+      <p class="stat-label">Total Entries</p>
+      <p class="stat-value" id="statTotal">0</p>
+    </div>
+    <div class="stat stat-issued">
+      <p class="stat-label">Currently Issued</p>
+      <p class="stat-value" id="statIssued">0</p>
+    </div>
+    <div class="stat stat-returned">
+      <p class="stat-label">Returned</p>
+      <p class="stat-value" id="statReturned">0</p>
+    </div>
+    <div class="stat stat-overdue">
+      <p class="stat-label">Overdue</p>
+      <p class="stat-value" id="statOverdue">0</p>
+    </div>
+  </section>
+
+  <section class="register-panel">
+    <div class="panel-head">
+      <h3>Register Entries</h3>
+      <div class="search-wrap">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="6.5" cy="6.5" r="5.25" stroke="currentColor" stroke-width="1.3"/>
+          <line x1="10.4" y1="10.6" x2="14" y2="14.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search item, person, purpose...">
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="register-table">
+        <thead>
+          <tr>
+            <th class="col-sr">Sr No.</th>
+            <th class="col-date">Date</th>
+            <th>Name</th>
+            <th>Student / Employee ID</th>
+            <th>Mobile No.</th>
+            <th>Email ID</th>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Issued By</th>
+            <th>Issued To</th>
+            <th>Purpose</th>
+            <th class="col-date">Due Date</th>
+            <th class="col-date">Return Date</th>
+            <th>Received By</th>
+            <th>Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- rows injected by app.js -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel-foot">
+      <p id="showingCount">Showing 0 of 0 entries</p>
+    </div>
+  </section>
+
+  </section>
+
+  <section class="entry-page" id="entryPage" hidden>
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">Register</p>
+        <h2>New Issue Entry</h2>
+      </div>
+      <button class="btn btn-ghost" id="backToDashboardBtn" type="button">Back to dashboard</button>
+    </div>
+    <div class="entry-form-panel">
+      <form id="entryPageForm" class="modal-body">
+        <div class="form-grid">
+          <label class="field">
+            <span>Date &amp; time *</span>
+            <input type="datetime-local" id="pageFDate" required>
+          </label>
+          <label class="field">
+            <span>Name of person *</span>
+            <input type="text" id="pageFName" placeholder="e.g. R. Menon" required>
+          </label>
+          <label class="field">
+            <span>Student / Employee ID *</span>
+            <input type="text" id="pageFStudentId" placeholder="e.g. 24CS002" required>
+          </label>
+          <label class="field">
+            <span>Mobile No. *</span>
+            <input type="tel" id="pageFMobile" placeholder="e.g. 9876543210" required>
+          </label>
+          <label class="field">
+            <span>Email ID</span>
+            <input type="email" id="pageFEmail" placeholder="Optional">
+          </label>
+          <label class="field">
+            <span>Item name *</span>
+            <input type="text" id="pageFItem" placeholder="e.g. Dell Latitude 5440 Laptop" required>
+          </label>
+          <label class="field">
+            <span>Quantity *</span>
+            <input type="number" id="pageFQuantity" min="1" step="1" placeholder="e.g. 2" required>
+          </label>
+          <label class="field">
+            <span>Issued by *</span>
+            <input type="text" id="pageFIssuedBy" placeholder="e.g. A. Sharma" required>
+          </label>
+          <label class="field">
+            <span>Issued to *</span>
+            <input type="text" id="pageFIssuedTo" placeholder="e.g. R. Menon" required>
+          </label>
+          <label class="field">
+            <span>Due date *</span>
+            <input type="date" id="pageFDueDate" required>
+          </label>
+          <label class="field field-wide">
+            <span>Purpose *</span>
+            <input type="text" id="pageFPurpose" placeholder="e.g. Client site visit" required>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelEntryPageBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<!-- New / Edit Entry Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Register</p>
+        <h3 id="modalTitle">New Issue Entry</h3>
+      </div>
+      <button class="modal-close" id="closeModalBtn" type="button" aria-label="Close">✕</button>
+    </div>
+
+    <form id="entryForm" class="modal-body">
+      <input type="hidden" id="entryId">
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Date &amp; time *</span>
+          <input type="datetime-local" id="fDate" required>
+        </label>
+        <label class="field">
+          <span>Name of person *</span>
+          <input type="text" id="fName" placeholder="e.g. R. Menon" required>
+        </label>
+        <label class="field">
+          <span>Student / Employee ID *</span>
+          <input type="text" id="fStudentId" placeholder="e.g. 24CS002" required>
+        </label>
+        <label class="field">
+          <span>Mobile No. *</span>
+          <input type="tel" id="fMobile" placeholder="e.g. 9876543210" required>
+        </label>
+        <label class="field">
+          <span>Email ID</span>
+          <input type="email" id="fEmail" placeholder="Optional">
+        </label>
+        <label class="field">
+          <span>Item name *</span>
+          <input type="text" id="fItem" placeholder="e.g. Dell Latitude 5440 Laptop" required>
+        </label>
+        <label class="field">
+          <span>Quantity *</span>
+          <input type="number" id="fQuantity" min="1" step="1" placeholder="e.g. 2" required>
+        </label>
+        <label class="field">
+          <span>Issued by *</span>
+          <input type="text" id="fIssuedBy" placeholder="e.g. A. Sharma" required>
+        </label>
+        <label class="field">
+          <span>Issued to *</span>
+          <input type="text" id="fIssuedTo" placeholder="e.g. R. Menon" required>
+        </label>
+        <label class="field">
+          <span>Due date *</span>
+          <input type="date" id="fDueDate" required>
+        </label>
+        <label class="field field-wide">
+          <span>Purpose *</span>
+          <input type="text" id="fPurpose" placeholder="e.g. Client site visit — Pune" required>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveEntryBtn">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-panel" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Administrator access</p>
+        <h3 id="loginTitle">Sign in to Issue Dashboard</h3>
+      </div>
+      <button class="modal-close" id="closeLoginBtn" type="button" aria-label="Close">✕</button>
+    </div>
+    <form id="loginForm" class="login-form">
+      <label class="field">
+        <span>Username</span>
+        <input type="text" id="loginUsername" autocomplete="username" required>
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </label>
+      <p class="login-error" id="loginError" role="alert"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancelLoginBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Access dashboard</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
