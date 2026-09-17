@@ -2,6 +2,7 @@
   "use strict";
 
   var STORAGE_KEY = "issueRegister.entries";
+  var INVENTORY_KEY = "issueRegister.inventory";
 
   var seedData = [
     { id: "0001", date: "2026-08-18T09:00", name: "R. Menon", studentId: "24CS001", mobile: "9876543210", email: "",
@@ -35,13 +36,20 @@
   ];
 
   var entries = loadEntries();
+  var inventory = loadInventory();
 
   var appShell = document.getElementById("appShell");
   var dashboardHome = document.getElementById("dashboardHome");
   var registerView = document.getElementById("registerView");
+  var inventoryView = document.getElementById("inventoryView");
   var entryPage = document.getElementById("entryPage");
   var dashboardNewEntryBtn = document.getElementById("dashboardNewEntryBtn");
   var dashboardViewBtn = document.getElementById("dashboardViewBtn");
+  var brandHomeBtn = document.getElementById("brandHomeBtn");
+  var brandMenu = document.getElementById("brandMenu");
+  var inventoryMenuBtn = document.getElementById("inventoryMenuBtn");
+  var darkModeMenuBtn = document.getElementById("darkModeMenuBtn");
+  var logoutMenuBtn = document.getElementById("logoutMenuBtn");
   var backToDashboardBtn = document.getElementById("backToDashboardBtn");
   var cancelEntryPageBtn = document.getElementById("cancelEntryPageBtn");
   var entryPageForm = document.getElementById("entryPageForm");
@@ -61,6 +69,7 @@
   var modalTitle = document.getElementById("modalTitle");
   var entryForm = document.getElementById("entryForm");
   var backFromRegisterBtn = document.getElementById("backFromRegisterBtn");
+  var backFromInventoryBtn = document.getElementById("backFromInventoryBtn");
   var closeModalBtn = document.getElementById("closeModalBtn");
   var cancelBtn = document.getElementById("cancelBtn");
 
@@ -78,6 +87,14 @@
   var fDueDate = document.getElementById("fDueDate");
   var pageFMobile = document.getElementById("pageFMobile");
   var pageFDueDate = document.getElementById("pageFDueDate");
+  var pageFQuantity = document.getElementById("pageFQuantity");
+  var inventoryForm = document.getElementById("inventoryForm");
+  var inventoryItemName = document.getElementById("inventoryItemName");
+  var inventoryItemQuantity = document.getElementById("inventoryItemQuantity");
+  var inventoryList = document.getElementById("inventoryList");
+  var exportCsvBtn = document.getElementById("exportCsvBtn");
+  var adminAuthenticated = false;
+  var inventoryRequested = false;
 
   init();
 
@@ -96,6 +113,10 @@
     setDueDateMinimums();
     dashboardNewEntryBtn.addEventListener("click", openNewEntryFromDashboard);
     dashboardViewBtn.addEventListener("click", openLogin);
+    brandHomeBtn.addEventListener("click", toggleBrandMenu);
+    inventoryMenuBtn.addEventListener("click", openInventoryFromMenu);
+    darkModeMenuBtn.addEventListener("click", toggleDarkMode);
+    logoutMenuBtn.addEventListener("click", logout);
     backToDashboardBtn.addEventListener("click", showDashboardHome);
     cancelEntryPageBtn.addEventListener("click", showDashboardHome);
     entryPageForm.addEventListener("submit", handleEntryPageSave);
@@ -106,6 +127,7 @@
       if (e.target === loginOverlay) closeLogin();
     });
     backFromRegisterBtn.addEventListener("click", showDashboardHome);
+    backFromInventoryBtn.addEventListener("click", showDashboardHome);
     closeModalBtn.addEventListener("click", closeModal);
     cancelBtn.addEventListener("click", closeModal);
     modalOverlay.addEventListener("click", function (e) {
@@ -116,8 +138,19 @@
       if (e.key === "Escape" && loginOverlay.classList.contains("open")) closeLogin();
     });
     entryForm.addEventListener("submit", handleSaveEntry);
+    inventoryForm.addEventListener("submit", handleInventorySave);
     searchInput.addEventListener("input", render);
+    pageFItem.addEventListener("change", updateQuantityLimit);
+    fItem.addEventListener("change", updateQuantityLimit);
+    exportCsvBtn.addEventListener("click", exportCsv);
+    document.addEventListener("click", closeBrandMenuOutside);
+    if (window.localStorage.getItem("issueRegister.darkMode") === "true") {
+      document.body.classList.add("dark-mode");
+      darkModeMenuBtn.textContent = "Light Mode";
+    }
 
+    renderInventory();
+    populateItemSelects();
     render();
     showAppShell();
   }
@@ -128,15 +161,68 @@
   }
 
   function showDashboardHome() {
+    brandMenu.hidden = true;
     dashboardHome.hidden = false;
     registerView.hidden = true;
     entryPage.hidden = true;
+    inventoryView.hidden = true;
   }
 
   function showRegisterView() {
+    brandMenu.hidden = true;
     dashboardHome.hidden = true;
     registerView.hidden = false;
     entryPage.hidden = true;
+    inventoryView.hidden = true;
+  }
+
+  function toggleBrandMenu(e) {
+    e.stopPropagation();
+    brandMenu.hidden = !brandMenu.hidden;
+  }
+
+  function closeBrandMenuOutside(e) {
+    if (!brandMenu.hidden && !brandMenu.contains(e.target) && e.target !== brandHomeBtn && !brandHomeBtn.contains(e.target)) {
+      brandMenu.hidden = true;
+    }
+  }
+
+  function openInventoryFromMenu() {
+    brandMenu.hidden = true;
+    if (!adminAuthenticated) {
+      inventoryRequested = true;
+      openLogin();
+      return;
+    }
+    showInventoryView();
+  }
+
+  function showInventoryView() {
+    brandMenu.hidden = true;
+    dashboardHome.hidden = true;
+    registerView.hidden = true;
+    entryPage.hidden = true;
+    inventoryView.hidden = false;
+    window.setTimeout(function () {
+      document.querySelector(".inventory-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+      inventoryItemName.focus();
+    }, 0);
+  }
+
+  function toggleDarkMode() {
+    brandMenu.hidden = true;
+    document.body.classList.toggle("dark-mode");
+    window.localStorage.setItem("issueRegister.darkMode", document.body.classList.contains("dark-mode"));
+    darkModeMenuBtn.textContent = document.body.classList.contains("dark-mode") ? "Light Mode" : "Dark Mode";
+  }
+
+  function logout() {
+    brandMenu.hidden = true;
+    adminAuthenticated = false;
+    inventoryRequested = false;
+    closeLogin();
+    showDashboardHome();
+    showToast("Logged out");
   }
 
   function openLogin() {
@@ -159,12 +245,19 @@
     }
 
     closeLogin();
-    showRegisterView();
+    adminAuthenticated = true;
+    if (inventoryRequested) {
+      inventoryRequested = false;
+      showInventoryView();
+    } else {
+      showRegisterView();
+    }
   }
 
   function openNewEntryFromDashboard() {
     dashboardHome.hidden = true;
     registerView.hidden = true;
+    inventoryView.hidden = true;
     entryPage.hidden = false;
     entryPageForm.reset();
     pageFMobile.setCustomValidity("");
@@ -178,6 +271,14 @@
   function handleEntryPageSave(e) {
     e.preventDefault();
     if (!validateEntryFields(pageFMobile, pageFDueDate)) return;
+    var item = getInventoryItem(pageFItem.value);
+    var quantity = parseInt(document.getElementById("pageFQuantity").value, 10);
+    if (!item || quantity > item.quantity) {
+      pageFQuantity.setCustomValidity("Quantity cannot exceed available stock.");
+      pageFQuantity.reportValidity();
+      return;
+    }
+    pageFQuantity.setCustomValidity("");
     entries.unshift({
       id: nextSrNo(),
       date: document.getElementById("pageFDate").value,
@@ -186,7 +287,7 @@
       mobile: document.getElementById("pageFMobile").value.trim(),
       email: document.getElementById("pageFEmail").value.trim(),
       item: document.getElementById("pageFItem").value.trim(),
-      quantity: document.getElementById("pageFQuantity").value,
+      quantity: String(quantity),
       issuedBy: document.getElementById("pageFIssuedBy").value.trim(),
       issuedTo: document.getElementById("pageFIssuedTo").value.trim(),
       purpose: document.getElementById("pageFPurpose").value.trim(),
@@ -195,6 +296,8 @@
       receivedBy: "",
       status: "Issued"
     });
+    item.quantity -= quantity;
+    saveInventory();
     saveEntries();
     render();
     showToast("Entry successfully added");
@@ -217,6 +320,111 @@
     } catch (err) {
       console.warn("Could not save register locally.", err);
     }
+  }
+
+  function loadInventory() {
+    try {
+      var raw = window.localStorage.getItem(INVENTORY_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (err) {
+      console.warn("Could not read saved inventory, starting fresh.", err);
+    }
+    var items = [];
+    seedData.forEach(function (entry) {
+      if (!items.some(function (item) { return item.name.toLowerCase() === entry.item.toLowerCase(); })) {
+        items.push({ name: entry.item, quantity: 10 });
+      }
+    });
+    return items;
+  }
+
+  function saveInventory() {
+    try {
+      window.localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+    } catch (err) {
+      console.warn("Could not save inventory locally.", err);
+    }
+  }
+
+  function getInventoryItem(name) {
+    return inventory.find(function (item) { return item.name === name; });
+  }
+
+  function populateItemSelects() {
+    [pageFItem, fItem].forEach(function (select) {
+      var selected = select.value;
+      select.innerHTML = '<option value="">Select an item</option>';
+      inventory.forEach(function (item) {
+        var option = document.createElement("option");
+        option.value = item.name;
+        option.textContent = item.name + " (available: " + item.quantity + ")";
+        select.appendChild(option);
+      });
+      if (getInventoryItem(selected)) select.value = selected;
+    });
+    updateQuantityLimit.call(pageFItem);
+  }
+
+  function updateQuantityLimit() {
+    var select = this.id === "fItem" ? fItem : pageFItem;
+    var quantityInput = select === fItem ? fQuantity : pageFQuantity;
+    var item = getInventoryItem(select.value);
+    quantityInput.max = item ? item.quantity : "";
+    if (item && parseInt(quantityInput.value || "0", 10) > item.quantity) quantityInput.value = item.quantity;
+  }
+
+  function handleInventorySave(e) {
+    e.preventDefault();
+    var name = inventoryItemName.value.trim();
+    var quantity = parseInt(inventoryItemQuantity.value, 10);
+    var existing = inventory.find(function (item) { return item.name.toLowerCase() === name.toLowerCase(); });
+    if (existing) existing.quantity = quantity;
+    else inventory.push({ name: name, quantity: quantity });
+    saveInventory();
+    renderInventory();
+    populateItemSelects();
+    inventoryForm.reset();
+    showToast("Inventory updated");
+  }
+
+  function renderInventory() {
+    inventoryList.innerHTML = "";
+    inventory.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "inventory-row";
+      row.innerHTML = '<span>' + escapeHtml(item.name) + '</span><strong>' + item.quantity + ' available</strong>' +
+        '<button type="button" class="icon-btn danger remove-item-btn" title="Remove item">✕</button>';
+      row.querySelector(".remove-item-btn").addEventListener("click", function () {
+        inventory = inventory.filter(function (candidate) { return candidate.name !== item.name; });
+        saveInventory();
+        renderInventory();
+        populateItemSelects();
+      });
+      inventoryList.appendChild(row);
+    });
+  }
+
+  function exportCsv() {
+    var headers = ["Sr No.", "Date", "Name", "Student / Employee ID", "Mobile No.", "Email ID", "Item Name", "Quantity", "Issued By", "Issued To", "Purpose", "Due Date", "Return Date", "Received By", "Status"];
+    var rows = entries.map(function (entry) {
+      return [entry.id, entry.date, entry.name, entry.studentId, entry.mobile, entry.email, entry.item, entry.quantity, entry.issuedBy, entry.issuedTo, entry.purpose, entry.dueDate, entry.returnDate, entry.receivedBy, effectiveStatus(entry)];
+    });
+    var csv = [headers].concat(rows).map(function (row) {
+      return row.map(function (value) { return '"' + String(value || "").replace(/"/g, '""') + '"'; }).join(",");
+    }).join("\r\n");
+    downloadFile("item-issue-register.csv", "text/csv;charset=utf-8", csv);
+    showToast("CSV downloaded");
+  }
+
+  function downloadFile(filename, type, content) {
+    var blob = new Blob([content], { type: type });
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
   }
 
   function todayISO() {
@@ -348,6 +556,7 @@
       '<td class="received-cell"></td>' +
       '<td class="status-cell"></td>' +
       '<td class="col-actions"><div class="row-actions">' +
+        '<button class="icon-btn email-btn" type="button" title="Send email"' + (entry.email ? "" : " disabled") + '>✉</button>' +
         '<button class="icon-btn edit-btn" type="button" title="Edit entry">✎</button>' +
         '<button class="icon-btn danger delete-btn" type="button" title="Delete entry">🗑</button>' +
       '</div></td>';
@@ -409,6 +618,13 @@
     tr.querySelector(".edit-btn").addEventListener("click", function () {
       openEditEntryModal(entry);
     });
+    if (entry.email) {
+      tr.querySelector(".email-btn").addEventListener("click", function () {
+        var subject = "Item issue register: " + entry.item;
+        var body = "Hello " + entry.name + ",\r\n\r\nThis is a message about your issued item: " + entry.item + ".\r\nQuantity: " + entry.quantity + "\r\nDue date: " + entry.dueDate + "\r\n\r\nRegards";
+        window.location.href = "mailto:" + encodeURIComponent(entry.email) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      });
+    }
     tr.querySelector(".delete-btn").addEventListener("click", function () {
       if (window.confirm('Delete the entry for "' + entry.item + '"? This cannot be undone.')) {
         entries = entries.filter(function (e) { return e.id !== entry.id; });
@@ -480,6 +696,14 @@
 
     var id = fEntryId.value;
     var isEdit = !!id;
+    var selectedItem = getInventoryItem(fItem.value);
+    var requestedQuantity = parseInt(fQuantity.value, 10);
+    if (!isEdit && (!selectedItem || requestedQuantity > selectedItem.quantity)) {
+      fQuantity.setCustomValidity("Quantity cannot exceed available stock.");
+      fQuantity.reportValidity();
+      return;
+    }
+    fQuantity.setCustomValidity("");
 
     var record = {
       id: isEdit ? id : nextSrNo(),
@@ -507,6 +731,10 @@
       showToast("Entry updated");
     } else {
       entries.unshift(record);
+      selectedItem.quantity -= requestedQuantity;
+      saveInventory();
+      renderInventory();
+      populateItemSelects();
       showToast("New issue entry added");
     }
 

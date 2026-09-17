@@ -13,14 +13,19 @@
 
 <div class="app-shell" id="appShell">
 <header class="topbar">
-  <div class="brand">
+  <button class="brand brand-button" id="brandHomeBtn" type="button" title="Go to dashboard" aria-label="Go to dashboard">
     <span class="brand-mark" aria-hidden="true">▤</span>
     <div class="brand-text">
       <h1>Item Issue Register</h1>
       <p>Stores &amp; Inventory Office</p>
     </div>
-  </div>
+  </button>
 </header>
+<nav class="brand-menu" id="brandMenu" hidden aria-label="Dashboard menu">
+  <button type="button" id="inventoryMenuBtn">Item Inventory</button>
+  <button type="button" id="darkModeMenuBtn">Dark Mode</button>
+  <button type="button" id="logoutMenuBtn">Logout</button>
+</nav>
 
 <main class="page">
 
@@ -85,6 +90,9 @@
         </svg>
         <input type="text" id="searchInput" placeholder="Search item, person, purpose...">
       </div>
+      <div class="export-actions" aria-label="Download register">
+        <button class="btn btn-export" id="exportCsvBtn" type="button" title="Download CSV">CSV</button>
+      </div>
     </div>
 
     <div class="table-scroll">
@@ -122,6 +130,37 @@
 
   </section>
 
+  <section class="inventory-view" id="inventoryView" hidden>
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">Administrator</p>
+        <h2>Item Inventory</h2>
+      </div>
+      <button class="btn btn-ghost" id="backFromInventoryBtn" type="button">Back to dashboard</button>
+    </div>
+    <section class="inventory-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Administrator</p>
+          <h3>Manage Items</h3>
+        </div>
+        <p class="panel-note">Add item names and available quantities for the issue form.</p>
+      </div>
+      <form class="inventory-form" id="inventoryForm">
+        <label class="field">
+          <span>Item name</span>
+          <input type="text" id="inventoryItemName" placeholder="e.g. HDMI Cable" required>
+        </label>
+        <label class="field">
+          <span>Quantity</span>
+          <input type="number" id="inventoryItemQuantity" min="0" step="1" placeholder="e.g. 10" required>
+        </label>
+        <button type="submit" class="btn btn-primary">Add / Update Item</button>
+      </form>
+      <div class="inventory-list" id="inventoryList"></div>
+    </section>
+  </section>
+
   <section class="entry-page" id="entryPage" hidden>
     <div class="page-head">
       <div>
@@ -155,7 +194,7 @@
           </label>
           <label class="field">
             <span>Item name *</span>
-            <input type="text" id="pageFItem" placeholder="e.g. Dell Latitude 5440 Laptop" required>
+            <select id="pageFItem" required></select>
           </label>
           <label class="field">
             <span>Quantity *</span>
@@ -225,7 +264,7 @@
         </label>
         <label class="field">
           <span>Item name *</span>
-          <input type="text" id="fItem" placeholder="e.g. Dell Latitude 5440 Laptop" required>
+          <select id="fItem" required></select>
         </label>
         <label class="field">
           <span>Quantity *</span>
